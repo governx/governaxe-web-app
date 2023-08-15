@@ -65,7 +65,7 @@ export function VoteForm() {
               <FormMessage />
               <RadioGroup
                 onValueChange={field.onChange}
-                className="grid grid-cols-3 gap-8 pt-2"
+                className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-2"
               >
                 <FormItem>
                   <FormLabel className="[&:has([data-state=checked])>div]:border-primary">

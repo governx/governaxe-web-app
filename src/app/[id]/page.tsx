@@ -71,7 +71,7 @@ export default function Home({ params }: { params: { id: string } }) {
       }}
     >
       <div className="w-full max-w-6xl gap-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-col md:flex-row">
           <div className="flex items-center gap-2">
             <Avatar className="mb-2">
               <AvatarImage src={dao?.image} alt={dao?.name} />
@@ -88,11 +88,11 @@ export default function Home({ params }: { params: { id: string } }) {
             </Button>
           </div>
         </div>
-        <div className="flex gap-4 justify-between mt-4">
-          <div className="flex gap-4 w-1/2">
+        <div className="flex flex-col md:flex-row gap-4 justify-between mt-4">
+          <div className="flex gap-4 md:w-1/2 flex-col md:flex-row">
             <Input type="search" placeholder="Search proposal" />
-            <Link href={`/${dao?.id}/create`} className="w-1/3">
-              <Button>New Proposal</Button>
+            <Link href={`/${dao?.id}/create`} className="md:w-2/3 lg:w-1/3">
+              <Button className="w-full">New Proposal</Button>
             </Link>
           </div>
           <DropdownMenu>
@@ -114,7 +114,7 @@ export default function Home({ params }: { params: { id: string } }) {
             <Link
               href={`/${dao?.id}/proposal/${proposal.id}`}
               key={index}
-              className="col-span-6"
+              className="col-span-12 md:col-span-6"
             >
               <Card className="hover:border-zinc-50 cursor-pointer">
                 <CardHeader>

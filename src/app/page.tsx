@@ -41,11 +41,19 @@ export default function Home() {
     >
       <div className="w-full max-w-6xl gap-4">
         <div className="flex gap-4">
-          <Input className="w-1/3" type="search" placeholder="Search" />
+          <Input
+            className="lg:w-1/3 md:w-2/3"
+            type="search"
+            placeholder="Search"
+          />
         </div>
         <div className="gap-4 grid grid-cols-12 mt-4">
           {daos.map((dao, index) => (
-            <Link href={`/${dao.id}`} key={index} className="col-span-3">
+            <Link
+              href={`/${dao.id}`}
+              key={index}
+              className="lg:col-span-3 md:col-span-4 col-span-12"
+            >
               <Card className="hover:border-zinc-50 cursor-pointer">
                 <CardHeader>
                   <Avatar className="mb-2">

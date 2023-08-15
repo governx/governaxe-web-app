@@ -101,7 +101,7 @@ export default function Home({
       }}
     >
       <div className="w-full max-w-6xl gap-4 grid grid-cols-12">
-        <div className="col-span-8">
+        <div className="col-span-12 md:col-span-8">
           <div className="flex items-center justify-between">
             <div className="gap-2">
               <Button
@@ -118,11 +118,13 @@ export default function Home({
             </div>
           </div>
           <div className="flex gap-4 justify-between mt-4">
-            <div className="flex gap-4">
-              <Badge className="mr-2">
-                <Icons.voting className="w-3 h-3 mr-1" />
-                Voting Period
-              </Badge>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div>
+                <Badge className="mr-2">
+                  <Icons.voting className="w-3 h-3 mr-1" />
+                  Voting Period
+                </Badge>
+              </div>
               <div className="flex items-center">
                 <Avatar className="mr-2 w-6 h-6">
                   <AvatarImage src={dao?.image} />
@@ -137,7 +139,7 @@ export default function Home({
               </div>
             </div>
           </div>
-          <p className="w-3/4 mt-4 text-muted-foreground">
+          <p className="hidden md:block md:w-3/4 mt-4 text-muted-foreground">
             {proposal?.description}
           </p>
           <div className="mt-4">
@@ -178,7 +180,7 @@ export default function Home({
             </CardContent>
           </Card>
         </div>
-        <div className="col-span-4 flex flex-col gap-4">
+        <div className="col-span-12 md:col-span-4 flex flex-col gap-4">
           <Card>
             <CardHeader>
               <CardTitle>Information</CardTitle>

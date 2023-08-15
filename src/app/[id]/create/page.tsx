@@ -97,7 +97,7 @@ export default function Home({
       }}
     >
       <div className="w-full max-w-6xl gap-4 grid grid-cols-12">
-        <div className="col-span-8">
+        <div className="col-span-12 md:col-spawn-8">
           <div className="flex items-center justify-between">
             <div className="gap-2">
               <Button
