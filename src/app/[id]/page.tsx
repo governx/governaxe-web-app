@@ -49,16 +49,16 @@ const proposals = [
     name: "Upgrade to v3",
     progress: 40,
   },
-  {
-    id: 2,
-    name: "Upgrade to v4",
-    progress: 90,
-  },
-  {
-    id: 3,
-    name: "Upgrade to v5",
-    progress: 60,
-  },
+  // {
+  //   id: 2,
+  //   name: "Upgrade to v4",
+  //   progress: 90,
+  // },
+  // {
+  //   id: 3,
+  //   name: "Upgrade to v5",
+  //   progress: 60,
+  // },
 ];
 export default function Home({ params }: { params: { id: string } }) {
   const id = params.id;
@@ -91,7 +91,7 @@ export default function Home({ params }: { params: { id: string } }) {
         <div className="flex flex-col md:flex-row gap-4 justify-between mt-4">
           <div className="flex gap-4 md:w-1/2 flex-col md:flex-row">
             <Input type="search" placeholder="Search proposal" />
-            <Link href={`/${dao?.id}/create`} className="md:w-2/3 lg:w-1/3">
+            <Link href={`/freeed.eth/create`} className="md:w-2/3 lg:w-1/3">
               <Button className="w-full">New Proposal</Button>
             </Link>
           </div>

@@ -18,11 +18,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
@@ -31,6 +27,11 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
+
+import { useAccount } from "wagmi";
+import { snapshotClient } from "@/lib/snapshotClient";
+import { useWeb3Provider } from "@/lib/ethers";
+import moment from "moment";
 
 const chainList = [
   { label: "Ethereum", value: "ETH" },
@@ -52,36 +53,73 @@ const FormSchema = z.object({
       message: "Discussion must be at least 2 characters.",
     })
     .optional(),
-  execution_block: z.number(),
+  execution_block: z.coerce.number(),
   contracts: z
     .array(
       z.object({
-        value: z.string().url({ message: "Please enter a valid URL." }),
+        value: z.string().min(2, { message: "Please enter a valid URL." }),
       })
     )
     .optional(),
   chains: z
     .array(
       z.object({
-        value: z.string().url({ message: "Please enter a valid URL." }),
+        value: z.string().min(2, { message: "Please enter a valid URL." }),
       })
     )
     .optional(),
 });
 
-export function InputForm() {
+export function InputForm({ spaceId }: { spaceId: string }) {
+  const { address } = useAccount();
+  const provider = useWeb3Provider();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    // console.log(data);
+    if (!provider) {
+      // Handle the case when provider is undefined
+      toast({
+        title: "Web3Provider is undefined",
+        description: "Please connect your wallet",
+      });
+      return;
+    }
+
+    if (!address) {
+      toast({
+        title: "Address is undefined",
+        description: "Please connect your wallet",
+      });
+      return;
+    }
+
+    const now = moment();
+    const start = now.unix(); // Current timestamp
+    const end = now.add(1, "hour").unix(); // Timestamp 1 hour from now
+
+    console.log("start", start);
+    console.log("end", end);
+
+    const receipt = await snapshotClient.proposal(provider, address, {
+      space: spaceId,
+      type: "single-choice",
+      title: "Test 2 proposal using Snapshot.js",
+      body: "This is the content of the proposal",
+      choices: ["Alice", "Bob", "Carol"],
+      start,
+      end,
+      snapshot: 13620822, //snapshot is block number
+      plugins: JSON.stringify({}),
+      app: "my-app",
+      discussion: "",
+    });
+    console.log("receipt", receipt);
     toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+      title: "Success",
+      description: "Your proposal has been submitted",
     });
   }
 
@@ -97,13 +135,10 @@ export function InputForm() {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="md:w-3/4 space-y-6"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className='md:w-3/4 space-y-6'>
         <FormField
           control={form.control}
-          name="title"
+          name='title'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
@@ -116,12 +151,12 @@ export function InputForm() {
         />
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea className="resize-none" {...field} />
+                <Textarea className='resize-none' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -129,19 +164,19 @@ export function InputForm() {
         />
         <FormField
           control={form.control}
-          name="execution_block"
+          name='execution_block'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Execution Block</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input type='number' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-6">
+        <div className='grid grid-cols-12 gap-4'>
+          <div className='col-span-6'>
             {contracts.fields.map((field, index) => (
               <FormField
                 control={form.control}
@@ -153,7 +188,7 @@ export function InputForm() {
                       Contracts (multi-chain)
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="0x1234...5678" />
+                      <Input {...field} placeholder='0x1234...5678' />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -161,10 +196,10 @@ export function InputForm() {
               />
             ))}
             <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-2"
+              type='button'
+              variant='outline'
+              size='sm'
+              className='mt-2'
               onClick={() => {
                 contracts.append({ value: "" });
                 chains.append({ value: "" });
@@ -173,37 +208,35 @@ export function InputForm() {
               Add Chain
             </Button>
           </div>
-          <div className="col-span-6 mt-8 gap-2 flex flex-col">
+          <div className='col-span-6 mt-8 gap-2 flex flex-col'>
             {chains.fields.map((field, index) => (
               <FormField
                 key={field.id}
                 control={form.control}
                 name={`chains.${index}.value`}
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className='flex flex-col'>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant="outline"
-                            role="combobox"
+                            variant='outline'
+                            role='combobox'
                             className={cn(
                               "w-[200px] justify-between",
                               !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value
-                              ? chainList.find(
-                                  (chain) => chain.value === field.value
-                                )?.label
+                              ? chainList.find((chain) => chain.value === field.value)?.label
                               : "Select chain"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
+                      <PopoverContent className='w-[200px] p-0'>
                         <Command>
-                          <CommandInput placeholder="Search framework..." />
+                          <CommandInput placeholder='Search framework...' />
                           <CommandEmpty>No framework found.</CommandEmpty>
                           <CommandGroup>
                             {chainList.map((chain) => (
@@ -211,18 +244,13 @@ export function InputForm() {
                                 value={chain.label}
                                 key={chain.value}
                                 onSelect={() => {
-                                  form.setValue(
-                                    `chains.${index}.value`,
-                                    chain.value
-                                  );
+                                  form.setValue(`chains.${index}.value`, chain.value);
                                 }}
                               >
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    chain.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
+                                    chain.value === field.value ? "opacity-100" : "opacity-0"
                                   )}
                                 />
                                 {chain.label}
@@ -241,21 +269,18 @@ export function InputForm() {
         </div>
         <FormField
           control={form.control}
-          name="discussion"
+          name='discussion'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Discussion (Optional)</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="https://forum.governaxe.xyz/proposal/1"
-                />
+                <Input {...field} placeholder='https://forum.governaxe.xyz/proposal/1' />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type='submit'>Submit</Button>
       </form>
     </Form>
   );

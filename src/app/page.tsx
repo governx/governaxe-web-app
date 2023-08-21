@@ -1,14 +1,25 @@
+import { Key } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { getClient } from "@/lib/gqlClient";
+import { gql } from "@apollo/client";
+const GET_FOLLOWS = gql`
+  query getFollows($follower: String!) {
+    follows(first: 10, where: { follower: $follower }) {
+      follower
+      space {
+        id
+        name
+        avatar
+        followersCount
+      }
+      created
+    }
+  }
+`;
 
 const daos = [
   {
@@ -31,32 +42,39 @@ const daos = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const { data } = await getClient().query({
+    query: GET_FOLLOWS,
+    variables: {
+      follower: "0xD682D2D047AF807561CDe82EEc248Ddf6654c83b",
+    },
+    context: {
+      fetchOptions: {
+        next: { revalidate: 20 },
+      },
+    },
+  });
   return (
     <main
-      className="flex flex-col items-center justify-between p-8"
+      className='flex flex-col items-center justify-between p-8'
       style={{
         minHeight: "calc(100vh - 5rem)",
       }}
     >
-      <div className="w-full max-w-6xl gap-4">
-        <div className="flex gap-4">
-          <Input
-            className="lg:w-1/3 md:w-2/3"
-            type="search"
-            placeholder="Search"
-          />
+      <div className='w-full max-w-6xl gap-4'>
+        <div className='flex gap-4'>
+          <Input className='lg:w-1/3 md:w-2/3' type='search' placeholder='Search' />
         </div>
-        <div className="gap-4 grid grid-cols-12 mt-4">
-          {daos.map((dao, index) => (
+        <div className='gap-4 grid grid-cols-12 mt-4'>
+          {/* {daos.map((dao, index) => (
             <Link
               href={`/${dao.id}`}
               key={index}
-              className="lg:col-span-3 md:col-span-4 col-span-12"
+              className='lg:col-span-3 md:col-span-4 col-span-12'
             >
-              <Card className="hover:border-zinc-50 cursor-pointer">
+              <Card className='hover:border-zinc-50 cursor-pointer'>
                 <CardHeader>
-                  <Avatar className="mb-2">
+                  <Avatar className='mb-2'>
                     <AvatarImage src={dao.image} alt={dao.name} />
                     <AvatarFallback>{dao.name.slice(0, 2)}</AvatarFallback>
                   </Avatar>
@@ -64,13 +82,59 @@ export default function Home() {
                   <CardDescription>{dao.members} Members</CardDescription>
                 </CardHeader>
                 <CardFooter>
-                  <Button className="w-full" variant="outline">
+                  <Button className='w-full' variant='outline'>
                     Join
                   </Button>
                 </CardFooter>
               </Card>
             </Link>
-          ))}
+          ))} */}
+
+          {data.follows.map(
+            (
+              dao: {
+                space: {
+                  id: string;
+                  avatar: string;
+                  name: string;
+                  followersCount: number;
+                };
+              },
+              index: Key | null | undefined
+            ) => (
+              // <Avatar className='border' key={index}>
+              //   <AvatarImage
+              //     src={`https://cloudflare-ipfs.com/ipfs/${dao.space.avatar.split("://")[1]}`}
+              //     alt={dao.space?.name}
+              //   />
+              //   <AvatarFallback>{dao.space?.name.slice(0, 2)}</AvatarFallback>
+              // </Avatar>
+              <Link
+                href={`/${dao.space?.id}`}
+                key={index}
+                className='lg:col-span-3 md:col-span-4 col-span-12'
+              >
+                <Card className='hover:border-zinc-50 cursor-pointer'>
+                  <CardHeader>
+                    <Avatar className='mb-2'>
+                      <AvatarImage
+                        src={`https://cloudflare-ipfs.com/ipfs/${dao.space.avatar.split("://")[1]}`}
+                        alt={dao.space?.name}
+                      />
+                      <AvatarFallback>{dao.space?.name.slice(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    <CardTitle>{dao.space?.name}</CardTitle>
+                    <CardDescription>{dao.space?.followersCount} Members</CardDescription>
+                  </CardHeader>
+                  <CardFooter>
+                    <Button className='w-full' variant='outline'>
+                      Join
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </Link>
+            )
+          )}
         </div>
       </div>
     </main>
