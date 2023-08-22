@@ -63,11 +63,6 @@ export default function Home() {
                   <CardTitle>{dao.name}</CardTitle>
                   <CardDescription>{dao.members} Members</CardDescription>
                 </CardHeader>
-                <CardFooter>
-                  <Button className="w-full" variant="outline">
-                    Join
-                  </Button>
-                </CardFooter>
               </Card>
             </Link>
           ))}

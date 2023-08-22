@@ -2,13 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
+import { format } from "date-fns";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,6 +31,8 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
+import { Icons } from "@/components/icons";
+import { Calendar } from "@/components/ui/calendar";
 
 const chainList = [
   { label: "Ethereum", value: "ETH" },
@@ -53,6 +55,7 @@ const FormSchema = z.object({
     })
     .optional(),
   execution_block: z.number(),
+  snapshot_block: z.number(),
   contracts: z
     .array(
       z.object({
@@ -67,6 +70,8 @@ const FormSchema = z.object({
       })
     )
     .optional(),
+  start_time: z.date(),
+  end_time: z.date(),
 });
 
 export function InputForm() {
@@ -129,6 +134,103 @@ export function InputForm() {
         />
         <FormField
           control={form.control}
+          name="start_time"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Voting Start time</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[240px] pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="end_time"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Voting End time</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[240px] pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="snapshot_block"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Snapshot Block</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="execution_block"
           render={({ field }) => (
             <FormItem>
@@ -140,6 +242,7 @@ export function InputForm() {
             </FormItem>
           )}
         />
+
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-6">
             {contracts.fields.map((field, index) => (

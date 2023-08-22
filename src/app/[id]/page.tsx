@@ -21,6 +21,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 const daos = [
   {
@@ -111,28 +112,35 @@ export default function Home({ params }: { params: { id: string } }) {
         </div>
         <div className="gap-4 grid grid-cols-12 mt-4">
           {proposals.map((proposal, index) => (
-            <Link
-              href={`/${dao?.id}/proposal/${proposal.id}`}
+            <Card
+              className="cursor-pointer col-span-12 md:col-span-6"
               key={index}
-              className="col-span-12 md:col-span-6"
             >
-              <Card className="hover:border-zinc-50 cursor-pointer">
-                <CardHeader>
-                  <CardTitle>
-                    <Badge className="mr-2">
-                      <Icons.voting className="w-3 h-3 mr-1" />
-                      Voting Period
-                    </Badge>
-                  </CardTitle>
-                  <CardDescription>
-                    #{proposal.id} {proposal.name}
-                  </CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <Progress className="mb-2" value={proposal.progress} />
-                </CardFooter>
-              </Card>
-            </Link>
+              <CardHeader>
+                <CardTitle className="justify-between flex">
+                  <Badge className="mr-2" variant="outline">
+                    <Icons.voting className="w-3 h-3 mr-1" />
+                    Voting Period
+                  </Badge>
+                  <Button
+                    size="sm"
+                    className="rounded-full gap-1 items-center"
+                    variant="secondary"
+                  >
+                    <Icons.snapshot className="w-4 h-4 text-yellow-500" />
+                    Snapshot
+                    <Icons.external className="w-3 h-3" />
+                  </Button>
+                </CardTitle>
+                <CardDescription>
+                  #{proposal.id} {proposal.name}
+                </CardDescription>
+              </CardHeader>
+              <CardFooter className="flex flex-col gap-1">
+                <Progress className="mb-2" value={proposal.progress} />
+                <Button className="w-full">Execute</Button>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       </div>

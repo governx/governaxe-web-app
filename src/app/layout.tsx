@@ -13,16 +13,18 @@ export const metadata: Metadata = {
   description: "Omnichain Governance",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Web3Provider>
-            <SideBar>
-              <NavBar />
-              {children}
-            </SideBar>
+            <NavBar />
+            {children}
           </Web3Provider>
         </ThemeProvider>
       </body>
