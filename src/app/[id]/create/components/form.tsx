@@ -34,6 +34,11 @@ import {
 import { Icons } from "@/components/icons";
 import { Calendar } from "@/components/ui/calendar";
 
+import { useAccount } from "wagmi";
+import { snapshotClient } from "@/lib/snapshotClient";
+import { useWeb3Provider } from "@/lib/ethers";
+import moment from "moment";
+
 const chainList = [
   { label: "Ethereum", value: "ETH" },
   { label: "Optimism", value: "OP" },
@@ -54,19 +59,19 @@ const FormSchema = z.object({
       message: "Discussion must be at least 2 characters.",
     })
     .optional(),
-  execution_block: z.number(),
-  snapshot_block: z.number(),
+  snapshot_block: z.coerce.number(),
+  execution_block: z.coerce.number(),
   contracts: z
     .array(
       z.object({
-        value: z.string().url({ message: "Please enter a valid URL." }),
+        value: z.string().min(2, { message: "Please enter a valid URL." }),
       })
     )
     .optional(),
   chains: z
     .array(
       z.object({
-        value: z.string().url({ message: "Please enter a valid URL." }),
+        value: z.string().min(2, { message: "Please enter a valid URL." }),
       })
     )
     .optional(),
@@ -74,19 +79,56 @@ const FormSchema = z.object({
   end_time: z.date(),
 });
 
-export function InputForm() {
+export function InputForm({ spaceId }: { spaceId: string }) {
+  const { address } = useAccount();
+  const provider = useWeb3Provider();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    // console.log(data);
+    if (!provider) {
+      // Handle the case when provider is undefined
+      toast({
+        title: "Web3Provider is undefined",
+        description: "Please connect your wallet",
+      });
+      return;
+    }
+
+    if (!address) {
+      toast({
+        title: "Address is undefined",
+        description: "Please connect your wallet",
+      });
+      return;
+    }
+
+    const now = moment();
+    const start = now.unix(); // Current timestamp
+    const end = now.add(1, "hour").unix(); // Timestamp 1 hour from now
+
+    console.log("start", start);
+    console.log("end", end);
+
+    const receipt = await snapshotClient.proposal(provider, address, {
+      space: spaceId,
+      type: "single-choice",
+      title: "Test 2 proposal using Snapshot.js",
+      body: "This is the content of the proposal",
+      choices: ["Alice", "Bob", "Carol"],
+      start,
+      end,
+      snapshot: 13620822, //snapshot is block number
+      plugins: JSON.stringify({}),
+      app: "my-app",
+      discussion: "",
+    });
+    console.log("receipt", receipt);
     toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+      title: "Success",
+      description: "Your proposal has been submitted",
     });
   }
 
@@ -236,7 +278,7 @@ export function InputForm() {
             <FormItem>
               <FormLabel>Execution Block</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input type="number" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

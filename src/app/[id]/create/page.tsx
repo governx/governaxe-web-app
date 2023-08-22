@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import { Badge } from "@/components/ui/badge";
@@ -79,11 +73,7 @@ const info = [
   },
 ];
 
-export default function Home({
-  params,
-}: {
-  params: { id: string; proposalid: string };
-}) {
+export default function Home({ params }: { params: { id: string; proposalid: string } }) {
   const id = params.id;
   const proposalid = params.proposalid;
   const proposal = proposals.find((proposal) => proposal.id === proposalid);
@@ -91,31 +81,31 @@ export default function Home({
   const router = useRouter();
   return (
     <main
-      className="flex flex-col items-center justify-between p-8"
+      className='flex flex-col items-center justify-between p-8'
       style={{
         minHeight: "calc(100vh - 5rem)",
       }}
     >
-      <div className="w-full max-w-6xl gap-4 grid grid-cols-12">
-        <div className="col-span-12 md:col-spawn-8">
-          <div className="flex items-center justify-between">
-            <div className="gap-2">
+      <div className='w-full max-w-6xl gap-4 grid grid-cols-12'>
+        <div className='col-span-12 md:col-spawn-8'>
+          <div className='flex items-center justify-between'>
+            <div className='gap-2'>
               <Button
-                variant="link"
-                className="px-0"
+                variant='link'
+                className='px-0'
                 onClick={() => {
                   router.back();
                 }}
               >
-                <Icons.back className="w-4 mr-1" />
+                <Icons.back className='w-4 mr-1' />
                 Back
               </Button>
-              <h1 className="text-2xl font-bold">{proposal?.name}</h1>
+              <h1 className='text-2xl font-bold'>{proposal?.name}</h1>
             </div>
           </div>
-          <InputForm />
+          <InputForm spaceId={id} />
         </div>
-        <div className="col-span-4 flex flex-col gap-4"></div>
+        <div className='col-span-4 flex flex-col gap-4'></div>
       </div>
     </main>
   );
