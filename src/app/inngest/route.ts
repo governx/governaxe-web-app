@@ -1,4 +1,4 @@
 import { serve } from "inngest/next";
-import { queueProposal, inngest } from "@/inngest";
+import { executeProposal, inngest } from "@/inngest";
 
-export const { GET, POST, PUT } = serve(inngest, [queueProposal]);
+export const { GET, POST, PUT } = serve(inngest, [executeProposal]);
