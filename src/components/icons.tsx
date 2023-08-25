@@ -1,5 +1,6 @@
 type IconProps = React.HTMLAttributes<SVGElement>;
 import {
+  AlertCircle,
   Calendar,
   CheckCircle,
   ChevronDown,
@@ -10,10 +11,15 @@ import {
   MoveLeft,
   Plus,
   XCircle,
+  XCircleIcon,
   Zap,
 } from "lucide-react";
 
 export const Icons = {
+  votingError: AlertCircle,
+  active: CheckCircle,
+  pending: CircleDashed,
+  closed: XCircleIcon,
   external: ExternalLink,
   snapshot: Zap,
   back: MoveLeft,

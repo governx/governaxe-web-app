@@ -18,7 +18,11 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
@@ -57,20 +61,26 @@ const FormSchema = z.object({
     .optional(),
   snapshot_block: z.coerce.number(),
   execution_block: z.coerce.number(),
-  contracts: z
-    .array(
-      z.object({
-        value: z.string().min(2, { message: "Please enter a valid URL." }),
-      })
-    )
-    .optional(),
-  chains: z
-    .array(
-      z.object({
-        value: z.string().min(2, { message: "Please enter a valid URL." }),
-      })
-    )
-    .optional(),
+  contracts: z.array(
+    z.object({
+      value: z.string().min(2, { message: "Please enter a valid URL." }),
+    })
+  ),
+  chains: z.array(
+    z.object({
+      value: z.string().min(2, { message: "Please enter a valid URL." }),
+    })
+  ),
+  values: z.array(
+    z.object({
+      value: z.string().min(2, { message: "Please enter a valid URL." }),
+    })
+  ),
+  functions: z.array(
+    z.object({
+      value: z.string().min(2, { message: "Please enter a valid URL." }),
+    })
+  ),
   start_time: z.date(),
   end_time: z.date(),
 });
@@ -144,12 +154,25 @@ export function InputForm({ spaceId }: { spaceId: string }) {
     control: form.control,
   });
 
+  const values = useFieldArray({
+    name: "values",
+    control: form.control,
+  });
+
+  const functions = useFieldArray({
+    name: "functions",
+    control: form.control,
+  });
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='md:w-3/4 space-y-6'>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="md:w-3/4 space-y-6"
+      >
         <FormField
           control={form.control}
-          name='title'
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
@@ -162,12 +185,12 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         />
         <FormField
           control={form.control}
-          name='description'
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea className='resize-none' {...field} />
+                <Textarea className="resize-none" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -175,9 +198,9 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         />
         <FormField
           control={form.control}
-          name='start_time'
+          name="start_time"
           render={({ field }) => (
-            <FormItem className='flex flex-col'>
+            <FormItem className="flex flex-col">
               <FormLabel>Voting Start time</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
@@ -189,17 +212,23 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                         !field.value && "text-muted-foreground"
                       )}
                     >
-                      {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                      <Icons.caldendar className='ml-auto h-4 w-4 opacity-50' />
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className='w-auto p-0' align='start'>
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                    mode='single'
+                    mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
                     initialFocus
                   />
                 </PopoverContent>
@@ -211,9 +240,9 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         />
         <FormField
           control={form.control}
-          name='end_time'
+          name="end_time"
           render={({ field }) => (
-            <FormItem className='flex flex-col'>
+            <FormItem className="flex flex-col">
               <FormLabel>Voting End time</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
@@ -225,17 +254,23 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                         !field.value && "text-muted-foreground"
                       )}
                     >
-                      {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                      <Icons.caldendar className='ml-auto h-4 w-4 opacity-50' />
+                      {field.value ? (
+                        format(field.value, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className='w-auto p-0' align='start'>
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                    mode='single'
+                    mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
                     initialFocus
                   />
                 </PopoverContent>
@@ -247,12 +282,12 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         />
         <FormField
           control={form.control}
-          name='snapshot_block'
+          name="snapshot_block"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Snapshot Block</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input placeholder="0" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -260,20 +295,20 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         />
         <FormField
           control={form.control}
-          name='execution_block'
+          name="execution_block"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Execution Block</FormLabel>
               <FormControl>
-                <Input type='number' {...field} />
+                <Input placeholder="0" type="number" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className='grid grid-cols-12 gap-4'>
-          <div className='col-span-6'>
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-3">
             {contracts.fields.map((field, index) => (
               <FormField
                 control={form.control}
@@ -285,7 +320,7 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                       Contracts (multi-chain)
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder='0x1234...5678' />
+                      <Input {...field} placeholder="0x1234...5678" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -293,47 +328,51 @@ export function InputForm({ spaceId }: { spaceId: string }) {
               />
             ))}
             <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              className='mt-2'
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-2"
               onClick={() => {
                 contracts.append({ value: "" });
                 chains.append({ value: "" });
+                values.append({ value: "" });
+                functions.append({ value: "" });
               }}
             >
               Add Chain
             </Button>
           </div>
-          <div className='col-span-6 mt-8 gap-2 flex flex-col'>
+          <div className="col-span-3 mt-8 gap-2 flex flex-col">
             {chains.fields.map((field, index) => (
               <FormField
                 key={field.id}
                 control={form.control}
                 name={`chains.${index}.value`}
                 render={({ field }) => (
-                  <FormItem className='flex flex-col'>
+                  <FormItem className="flex flex-col">
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant='outline'
-                            role='combobox'
+                            variant="outline"
+                            role="combobox"
                             className={cn(
                               "w-[200px] justify-between",
                               !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value
-                              ? chainList.find((chain) => chain.value === field.value)?.label
+                              ? chainList.find(
+                                  (chain) => chain.value === field.value
+                                )?.label
                               : "Select chain"}
-                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className='w-[200px] p-0'>
+                      <PopoverContent className="w-[200px] p-0">
                         <Command>
-                          <CommandInput placeholder='Search framework...' />
+                          <CommandInput placeholder="Search framework..." />
                           <CommandEmpty>No framework found.</CommandEmpty>
                           <CommandGroup>
                             {chainList.map((chain) => (
@@ -341,13 +380,18 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                                 value={chain.label}
                                 key={chain.value}
                                 onSelect={() => {
-                                  form.setValue(`chains.${index}.value`, chain.value);
+                                  form.setValue(
+                                    `chains.${index}.value`,
+                                    chain.value
+                                  );
                                 }}
                               >
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    chain.value === field.value ? "opacity-100" : "opacity-0"
+                                    chain.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
                                   )}
                                 />
                                 {chain.label}
@@ -363,21 +407,58 @@ export function InputForm({ spaceId }: { spaceId: string }) {
               />
             ))}
           </div>
+          <div className="col-span-3 mt-8 gap-2 flex flex-col">
+            {values.fields.map((field, index) => (
+              <FormField
+                control={form.control}
+                key={field.id}
+                name={`values.${index}.value`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input {...field} placeholder="value" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
+          <div className="col-span-3 mt-8 gap-2 flex flex-col">
+            {functions.fields.map((field, index) => (
+              <FormField
+                control={form.control}
+                key={field.id}
+                name={`functions.${index}.value`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input {...field} placeholder="function" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
         </div>
         <FormField
           control={form.control}
-          name='discussion'
+          name="discussion"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Discussion (Optional)</FormLabel>
               <FormControl>
-                <Input {...field} placeholder='https://forum.governaxe.xyz/proposal/1' />
+                <Input
+                  {...field}
+                  placeholder="https://forum.governaxe.xyz/proposal/1"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type='submit'>Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   );
