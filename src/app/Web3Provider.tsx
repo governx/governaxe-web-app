@@ -1,7 +1,11 @@
 "use client";
 import "@rainbow-me/rainbowkit/styles.css";
 import { FC, PropsWithChildren } from "react";
-import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
+import {
+  RainbowKitProvider,
+  getDefaultWallets,
+  darkTheme,
+} from "@rainbow-me/rainbowkit";
 // import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
@@ -11,7 +15,9 @@ import { env } from "@/env.mjs";
 
 const supportedChains = [mainnet, goerli, baseGoerli, optimismGoerli];
 
-const { chains, publicClient } = configureChains(supportedChains, [publicProvider()]);
+const { chains, publicClient } = configureChains(supportedChains, [
+  publicProvider(),
+]);
 
 const { connectors } = getDefaultWallets({
   appName: "Governaxe",
@@ -41,7 +47,16 @@ const config = createConfig({
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
   //   <SessionProvider>
   <WagmiConfig config={config}>
-    <RainbowKitProvider chains={chains}>
+    <RainbowKitProvider
+      theme={darkTheme({
+        accentColor: "#fff",
+        accentColorForeground: "black",
+        borderRadius: "large",
+        fontStack: "system",
+        overlayBlur: "small",
+      })}
+      chains={chains}
+    >
       {/* <ConnectKitProvider theme='midnight'> */}
       {children}
       {/* </ConnectKitProvider> */}
