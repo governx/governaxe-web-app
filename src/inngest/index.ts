@@ -8,14 +8,14 @@ import { env } from "@/env.mjs";
 export const inngest = new Inngest({ name: "Governaxe" });
 
 //reset limit and dequeue every 15 minutesw
-export const queueProposal = inngest.createFunction(
-  { name: "Queue proposal" },
-  { event: "proposal/queue" },
+export const executeProposal = inngest.createFunction(
+  { name: "execute proposal" },
+  { event: "proposal/execute" },
   async ({ event, step }) => {
     await step.sleepUntil(event.data.run_at);
 
-    await step.run("queue", async () => {
-      console.log("Queue proposal");
+    await step.run("execute", async () => {
+      console.log("Execute proposal");
     });
   }
 );
