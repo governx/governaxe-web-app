@@ -38,6 +38,7 @@
     "eslint-config-next": "13.4.13",
     "ethers": "5.7",
     "graphql": "^16.8.0",
+    "inngest": "^2.6.0",
     "lucide-react": "^0.263.1",
     "moment": "^2.29.4",
     "next": "13.4.13",
