@@ -5,6 +5,14 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { format } from "date-fns";
 import * as z from "zod";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -49,6 +57,9 @@ const chainList = [
 
 const FormSchema = z.object({
   title: z.string().min(2, {
+    message: "Title must be at least 2 characters.",
+  }),
+  type: z.string().min(2, {
     message: "Title must be at least 2 characters.",
   }),
   description: z.string().min(2, {
@@ -198,6 +209,29 @@ export function InputForm({ spaceId }: { spaceId: string }) {
               <FormLabel>Title</FormLabel>
               <FormControl>
                 <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Type</FormLabel>
+              <FormControl>
+                <Select disabled>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue
+                      defaultValue="basic-voting"
+                      placeholder="Basic Voting"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basic-voting">Basic Voting</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
