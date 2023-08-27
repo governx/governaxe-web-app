@@ -38,6 +38,7 @@ import { useAccount } from "wagmi";
 import { snapshotClient } from "@/lib/snapshotClient";
 import { useWeb3Provider } from "@/lib/ethers";
 import moment from "moment";
+import { Time } from "@/components/ui/time";
 
 const chainList = [
   { label: "Ethereum", value: "ETH" },
@@ -82,7 +83,26 @@ const FormSchema = z.object({
     })
   ),
   start_time: z.date(),
+  start_time_2: z.string().refine(
+    (value) => {
+      const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/; // Regular expression for 24-hour time format
+      return timePattern.test(value);
+    },
+    {
+      message: "Start time must be in the format 'HH:mm' (00:00 - 23:59).",
+    }
+  ),
+
   end_time: z.date(),
+  end_time_2: z.string().refine(
+    (value) => {
+      const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/; // Regular expression for 24-hour time format
+      return timePattern.test(value);
+    },
+    {
+      message: "Start time must be in the format 'HH:mm' (00:00 - 23:59).",
+    }
+  ),
 });
 
 export function InputForm({ spaceId }: { spaceId: string }) {
@@ -196,90 +216,126 @@ export function InputForm({ spaceId }: { spaceId: string }) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="start_time"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Voting Start time</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="start_time"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Voting Start time</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="end_time"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Voting End time</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="start_time_2"
+              render={({ field }) => (
+                <FormItem className="mt-5 w-20">
                   <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
+                    <Input {...field} placeholder="10:00" />
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="end_time"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Voting End time</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="end_time_2"
+              render={({ field }) => (
+                <FormItem className="mt-5 w-20">
+                  <FormControl>
+                    <Input {...field} placeholder="11:00" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
         <FormField
           control={form.control}
           name="snapshot_block"
