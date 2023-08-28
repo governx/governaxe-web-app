@@ -1,13 +1,20 @@
-// "use client";
-// import { getDefaultWallets } from "@rainbow-me/rainbowkit";
-// import { configureChains, createConfig } from "wagmi";
+import { configureChains } from "wagmi";
+import { createWalletClient, http, createPublicClient } from "viem";
 // import { mainnet, goerli, baseGoerli, optimismGoerli } from "wagmi/chains";
+import { goerli } from "viem/chains";
 // import { publicProvider } from "wagmi/providers/public";
-// import { env } from "@/env.mjs";
 
 // const supportedChains = [mainnet, goerli, baseGoerli, optimismGoerli];
+export const publicClient = createPublicClient({
+  chain: goerli,
+  transport: http(),
+});
 
-// export const { chains, publicClient } = configureChains(supportedChains, [publicProvider()]);
+// export const { publicClient } = configureChains(supportedChains, [publicProvider()]);
+export const walletClient = createWalletClient({
+  chain: goerli,
+  transport: http(),
+});
 
 // const { connectors } = getDefaultWallets({
 //   appName: "Governaxe",

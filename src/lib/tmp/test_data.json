@@ -1,0 +1,11 @@
+{
+    "src_chain": "ETH",
+    "proposals": [
+        {
+            "dst_chain": "BSC",
+            "contract": "0x000000",
+            "method": "test(string)",
+            "args": []
+        }
+    ]
+}
