@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -41,76 +40,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { useAccount } from "wagmi";
 import { snapshotClient } from "@/lib/snapshotClient";
 import { useWeb3Provider } from "@/lib/ethers";
+import { FormSchema, ProposalType, chainList } from "@/lib/form";
 import moment from "moment";
-import { Time } from "@/components/ui/time";
-
-const chainList = [
-  { label: "Ethereum", value: "ETH" },
-  { label: "Optimism", value: "OP" },
-  { label: "Base", value: "BASE" },
-  { label: "Arbitrum", value: "ARB" },
-] as const;
-
-const FormSchema = z.object({
-  title: z.string().min(2, {
-    message: "Title must be at least 2 characters.",
-  }),
-  type: z.string().min(2, {
-    message: "Title must be at least 2 characters.",
-  }),
-  description: z.string().min(2, {
-    message: "Description must be at least 2 characters.",
-  }),
-  discussion: z
-    .string()
-    .min(2, {
-      message: "Discussion must be at least 2 characters.",
-    })
-    .optional(),
-  snapshot_block: z.coerce.number(),
-  execution_block: z.coerce.number(),
-  contracts: z.array(
-    z.object({
-      value: z.string().min(2, { message: "Please enter a valid URL." }),
-    })
-  ),
-  chains: z.array(
-    z.object({
-      value: z.string().min(2, { message: "Please enter a valid URL." }),
-    })
-  ),
-  values: z.array(
-    z.object({
-      value: z.string().min(2, { message: "Please enter a valid URL." }),
-    })
-  ),
-  functions: z.array(
-    z.object({
-      value: z.string().min(2, { message: "Please enter a valid URL." }),
-    })
-  ),
-  start_time: z.date(),
-  start_time_2: z.string().refine(
-    (value) => {
-      const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/; // Regular expression for 24-hour time format
-      return timePattern.test(value);
-    },
-    {
-      message: "Start time must be in the format 'HH:mm' (00:00 - 23:59).",
-    }
-  ),
-
-  end_time: z.date(),
-  end_time_2: z.string().refine(
-    (value) => {
-      const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/; // Regular expression for 24-hour time format
-      return timePattern.test(value);
-    },
-    {
-      message: "Start time must be in the format 'HH:mm' (00:00 - 23:59).",
-    }
-  ),
-});
 
 export function InputForm({ spaceId }: { spaceId: string }) {
   const { address } = useAccount();
@@ -138,56 +69,53 @@ export function InputForm({ spaceId }: { spaceId: string }) {
     }
 
     console.log("data", data);
+    const startTime = moment(data.start_time).add(data.start_time_2, "hours").unix();
+    const endTime = moment(data.end_time).add(data.end_time_2, "hours").unix();
 
-    // const now = moment();
-    // const start = now.unix(); // Current timestamp
-    // const end = now.add(1, "hour").unix(); // Timestamp 1 hour from now
+    console.log("endTime", endTime);
 
-    // console.log("start", start);
-    // console.log("end", end);
+    console.log("Date endTime", new Date(endTime * 1000));
+    const endTimeDate = moment(endTime).format("YYYY-MM-DDTHH:mm:ss.sssZ");
+
+    let proposalType = data.type as ProposalType;
+    // console.log("startTime", startTimeDate);
+    console.log("endTimeDate", endTimeDate);
     try {
-      const receipt = await snapshotClient.proposal(provider, address, {
-        space: spaceId,
-        type: "single-choice",
-        title: data.title,
-        body: data.description,
-        choices: ["Alice", "Bob", "Carol"],
-        start: moment(data.start_time).unix(),
-        end: moment(data.end_time).unix(),
-        snapshot: data.snapshot_block, //snapshot is block number
-        plugins: JSON.stringify({}),
-        discussion: "",
-      });
-      console.log("receipt", receipt);
-    } catch (e) {
-      console.log("error");
-      // toast({
-      //   title: "Error",
+      // const receipt = await snapshotClient.proposal(provider, address, {
+      //   space: spaceId,
+      //   type: proposalType,
+      //   title: data.title,
+      //   body: data.description,
+      //   choices: ["For", "Against", "Abstain"],
+      //   start: startTime,
+      //   end: endTime,
+      //   snapshot: data.snapshot_block, //snapshot is block number
+      //   plugins: JSON.stringify({}),
+      //   discussion: "",
       // });
+      // console.log("receipt", receipt);
+      const res = await fetch("/api/proposal", {
+        method: "POST",
+        body: JSON.stringify({
+          src_chain: data.src_chain,
+          proposals: data.proposals,
+          run_at: endTimeDate,
+        }),
+      });
+      console.log("res", res);
+    } catch (e) {
+      console.log("e", e);
+      console.log("error");
     }
+
     // toast({
     //   title: "Success",
     //   description: "Your proposal has been submitted",
     // });
   }
 
-  const contracts = useFieldArray({
-    name: "contracts",
-    control: form.control,
-  });
-
-  const chains = useFieldArray({
-    name: "chains",
-    control: form.control,
-  });
-
-  const values = useFieldArray({
-    name: "values",
-    control: form.control,
-  });
-
-  const functions = useFieldArray({
-    name: "functions",
+  const proposals = useFieldArray({
+    name: "proposals",
     control: form.control,
   });
 
@@ -209,20 +137,17 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         />
         <FormField
           control={form.control}
-          name="type"
+          name='type'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Type</FormLabel>
               <FormControl>
                 <Select disabled>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue
-                      defaultValue="basic-voting"
-                      placeholder="Basic Voting"
-                    />
+                  <SelectTrigger className='w-[180px]'>
+                    <SelectValue defaultValue='basic' placeholder='Basic Voting' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="basic-voting">Basic Voting</SelectItem>
+                    <SelectItem value='basic'>Basic Voting</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -232,7 +157,7 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         />
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
@@ -243,13 +168,13 @@ export function InputForm({ spaceId }: { spaceId: string }) {
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
+        <div className='grid grid-cols-12 gap-4'>
+          <div className='col-span-4'>
             <FormField
               control={form.control}
-              name="start_time"
+              name='start_time'
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className='flex flex-col'>
                   <FormLabel>Voting Start time</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -261,23 +186,17 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
+                          {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                          <Icons.caldendar className='ml-auto h-4 w-4 opacity-50' />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className='w-auto p-0' align='start'>
                       <Calendar
-                        mode="single"
+                        mode='single'
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
+                        disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                         initialFocus
                       />
                     </PopoverContent>
@@ -288,14 +207,14 @@ export function InputForm({ spaceId }: { spaceId: string }) {
               )}
             />
           </div>
-          <div className="col-span-4">
+          <div className='col-span-4'>
             <FormField
               control={form.control}
-              name="start_time_2"
+              name='start_time_2'
               render={({ field }) => (
-                <FormItem className="mt-5 w-20">
+                <FormItem className='mt-5 w-20'>
                   <FormControl>
-                    <Input {...field} placeholder="10:00" />
+                    <Input {...field} placeholder='10:00' />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -303,13 +222,13 @@ export function InputForm({ spaceId }: { spaceId: string }) {
             />
           </div>
         </div>
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
+        <div className='grid grid-cols-12 gap-4'>
+          <div className='col-span-4'>
             <FormField
               control={form.control}
-              name="end_time"
+              name='end_time'
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className='flex flex-col'>
                   <FormLabel>Voting End time</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -321,23 +240,17 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <Icons.caldendar className="ml-auto h-4 w-4 opacity-50" />
+                          {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                          <Icons.caldendar className='ml-auto h-4 w-4 opacity-50' />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className='w-auto p-0' align='start'>
                       <Calendar
-                        mode="single"
+                        mode='single'
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
+                        disabled={(date) => date < new Date("1900-01-01")}
                         initialFocus
                       />
                     </PopoverContent>
@@ -348,14 +261,14 @@ export function InputForm({ spaceId }: { spaceId: string }) {
               )}
             />
           </div>
-          <div className="col-span-4">
+          <div className='col-span-4'>
             <FormField
               control={form.control}
-              name="end_time_2"
+              name='end_time_2'
               render={({ field }) => (
-                <FormItem className="mt-5 w-20">
+                <FormItem className='mt-5 w-20'>
                   <FormControl>
-                    <Input {...field} placeholder="11:00" />
+                    <Input {...field} placeholder='11:00' />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -376,148 +289,225 @@ export function InputForm({ spaceId }: { spaceId: string }) {
             </FormItem>
           )}
         />
-        {/* <FormField
-          control={form.control}
-          name="execution_block"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Execution Block</FormLabel>
-              <FormControl>
-                <Input placeholder="0" type="number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
-
-        <div className='grid grid-cols-12 gap-4'>
-          <div className='col-span-3'>
-            {contracts.fields.map((field, index) => (
-              <FormField
-                control={form.control}
-                key={field.id}
-                name={`contracts.${index}.value`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={cn(index !== 0 && "sr-only")}>
-                      Contracts (multi-chain)
-                    </FormLabel>
+        <div className='grid grid-cols-6 gap-4'>
+          <FormField
+            control={form.control}
+            name='src_chain'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='w-[200px]'>Source Chain</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <FormControl>
-                      <Input {...field} placeholder='0x1234...5678' />
+                      <Button
+                        variant='outline'
+                        role='combobox'
+                        className={cn(
+                          "justify-between w-[200px]",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value
+                          ? chainList.find((chain) => chain.value === field.value)?.label
+                          : "Select chain"}
+                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                      </Button>
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
+                  </PopoverTrigger>
+                  <PopoverContent className=' p-0'>
+                    <Command>
+                      <CommandInput placeholder='Search framework...' />
+                      <CommandEmpty>No framework found.</CommandEmpty>
+                      <CommandGroup>
+                        {chainList.map((chain) => (
+                          <CommandItem
+                            value={chain.label}
+                            key={chain.value}
+                            onSelect={() => {
+                              form.setValue(`src_chain`, chain.value);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                chain.value === field.value ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {chain.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className='grid grid-cols-12 '>
+          <div className='col-span-12 mt-8 gap-2 flex flex-col '>
+            {proposals.fields.map((field, index) => {
+              return (
+                <>
+                  <div className='flex flex-row gap-4'>
+                    <FormField
+                      control={form.control}
+                      key={field.id}
+                      name={`proposals.${index}.dst_chain`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>
+                            Destination Chain
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  role='combobox'
+                                  className={cn(
+                                    "justify-between w-[200px]",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? chainList.find((chain) => chain.value === field.value)?.label
+                                    : "Select chain"}
+                                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className=' p-0'>
+                              <Command>
+                                <CommandInput placeholder='Search framework...' />
+                                <CommandEmpty>No framework found.</CommandEmpty>
+                                <CommandGroup>
+                                  {chainList.map((chain) => (
+                                    <CommandItem
+                                      value={chain.label}
+                                      key={chain.value}
+                                      onSelect={() => {
+                                        form.setValue(`proposals.${index}.dst_chain`, chain.value);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          chain.value === field.value ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {chain.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      key={field.id}
+                      name={`proposals.${index}.dst_contract`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>
+                            Destination Contract
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder='0x1234...5678' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      key={field.id}
+                      name={`proposals.${index}.calls.func_selector`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>
+                            Function Selector
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder='function' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      key={field.id}
+                      name={`proposals.${index}.calls.args`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>Arguments</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder='value' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      key={field.id}
+                      name={`proposals.${index}.calls.value`}
+                      render={({ field }) => (
+                        <FormItem className='w-[80px]'>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>Value</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder='value' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {/* //TODO: add remove button */}
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      className=' bg-red-700 mt-8'
+                      onClick={() => {
+                        proposals.remove(index);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </>
+              );
+            })}
             <Button
               type='button'
               variant='outline'
               size='sm'
               className='mt-2'
               onClick={() => {
-                contracts.append({ value: "" });
-                chains.append({ value: "" });
-                values.append({ value: "" });
-                functions.append({ value: "" });
+                proposals.append({
+                  calls: {
+                    args: "",
+                    func_selector: "",
+                    target: "",
+                    value: 0,
+                  },
+                  dst_chain: "",
+                  dst_contract: "",
+                });
               }}
             >
-              Add Chain
+              Add Proposal
             </Button>
           </div>
-          <div className='col-span-3 mt-8 gap-2 flex flex-col'>
-            {chains.fields.map((field, index) => (
-              <FormField
-                key={field.id}
-                control={form.control}
-                name={`chains.${index}.value`}
-                render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant='outline'
-                            role='combobox'
-                            className={cn(
-                              "w-[200px] justify-between",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? chainList.find((chain) => chain.value === field.value)?.label
-                              : "Select chain"}
-                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className='w-[200px] p-0'>
-                        <Command>
-                          <CommandInput placeholder='Search framework...' />
-                          <CommandEmpty>No framework found.</CommandEmpty>
-                          <CommandGroup>
-                            {chainList.map((chain) => (
-                              <CommandItem
-                                value={chain.label}
-                                key={chain.value}
-                                onSelect={() => {
-                                  form.setValue(`chains.${index}.value`, chain.value);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    chain.value === field.value ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {chain.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-          </div>
-          <div className='col-span-3 mt-8 gap-2 flex flex-col'>
-            {values.fields.map((field, index) => (
-              <FormField
-                control={form.control}
-                key={field.id}
-                name={`values.${index}.value`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input {...field} placeholder='value' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-          </div>
-          <div className='col-span-3 mt-8 gap-2 flex flex-col'>
-            {functions.fields.map((field, index) => (
-              <FormField
-                control={form.control}
-                key={field.id}
-                name={`functions.${index}.value`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input {...field} placeholder='function' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-          </div>
         </div>
+
         <FormField
           control={form.control}
           name='discussion'
