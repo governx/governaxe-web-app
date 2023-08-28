@@ -81,19 +81,19 @@ export function InputForm({ spaceId }: { spaceId: string }) {
     // console.log("startTime", startTimeDate);
     console.log("endTimeDate", endTimeDate);
     try {
-      // const receipt = await snapshotClient.proposal(provider, address, {
-      //   space: spaceId,
-      //   type: proposalType,
-      //   title: data.title,
-      //   body: data.description,
-      //   choices: ["For", "Against", "Abstain"],
-      //   start: startTime,
-      //   end: endTime,
-      //   snapshot: data.snapshot_block, //snapshot is block number
-      //   plugins: JSON.stringify({}),
-      //   discussion: "",
-      // });
-      // console.log("receipt", receipt);
+      const receipt = await snapshotClient.proposal(provider, address, {
+        space: spaceId,
+        type: proposalType,
+        title: data.title,
+        body: data.description,
+        choices: ["For", "Against", "Abstain"],
+        start: startTime,
+        end: endTime,
+        snapshot: data.snapshot_block, //snapshot is block number
+        plugins: JSON.stringify({}),
+        discussion: "",
+      });
+      console.log("receipt", receipt);
       const res = await fetch("/api/proposal", {
         method: "POST",
         body: JSON.stringify({
