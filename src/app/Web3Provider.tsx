@@ -13,7 +13,7 @@ import { mainnet, goerli, baseGoerli, optimismGoerli } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { env } from "@/env.mjs";
 
-const supportedChains = [mainnet, goerli, baseGoerli, optimismGoerli];
+const supportedChains = [goerli, baseGoerli, optimismGoerli];
 
 const { chains, publicClient } = configureChains(supportedChains, [
   publicProvider(),
