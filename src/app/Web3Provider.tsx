@@ -51,7 +51,7 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
       theme={darkTheme({
         accentColor: "#fff",
         accentColorForeground: "black",
-        borderRadius: "large",
+        borderRadius: "small",
         fontStack: "system",
         overlayBlur: "small",
       })}

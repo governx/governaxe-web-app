@@ -127,18 +127,15 @@ export default async function Home({ params }: { params: { id: string } }) {
                 key={index}
               >
                 <CardHeader>
-                  <CardTitle className="justify-between flex mb-4">
-                    <Badge className="mr-2" variant="outline">
-                      <StatusIcon status={proposal.state} />
-                      {proposal.state}
-                    </Badge>
+                  <CardTitle className="justify-between flex mb-2">
+                    <StatusIcon status={proposal.state} />
                     <Link
                       href={`${url}/${id}/proposal/${proposal.id}`}
                       target="_blank"
                     >
                       <Button
                         size="sm"
-                        className="rounded-full gap-1 items-center"
+                        className="gap-1 items-center"
                         variant="secondary"
                       >
                         <Icons.snapshot className="w-4 h-4 text-yellow-500" />
@@ -151,13 +148,13 @@ export default async function Home({ params }: { params: { id: string } }) {
                 </CardHeader>
                 <CardFooter className="flex flex-col gap-1">
                   {/* <Progress className='mb-2' value={proposal.state} /> */}
-                  <div className="flex gap-2 w-full">
-                    <Button variant="ghost" className="text-destructive">
+                  <div className="flex gap-2 w-full justify-between">
+                    <Button size="sm" variant="ghost">
                       Cancel
                     </Button>
-                    <Button className="w-full">Execute</Button>
+                    <Button size="sm">Execute</Button>
                   </div>
-                  {/* <Button variant="destructive" className="w-full">
+                  {/* <Button variant="destructive" size="sm" className="w-full">
                     Cancel
                   </Button> */}
                 </CardFooter>
@@ -173,12 +170,40 @@ export default async function Home({ params }: { params: { id: string } }) {
 const StatusIcon = ({ status }: { status: string }) => {
   switch (status) {
     case "active":
-      return <Icons.active className="w-4 h-4 mr-1 text-green-400" />;
+      return (
+        <Badge className="bg-green-300 hover:bg-green-300">
+          <div className="text-zinc-950 flex items-center">
+            <Icons.active className="w-3 h-3 mr-1" />
+            <p>{status.toLocaleUpperCase()}</p>
+          </div>
+        </Badge>
+      );
     case "pending":
-      return <Icons.pending className="w-4 h-4 mr-1 text-blue-400" />;
+      return (
+        <Badge className="bg-blue-300 hover:bg-blue-300">
+          <div className="text-zinc-950 flex items-center">
+            <Icons.pending className="w-3 h-3 mr-1" />
+            <p>{status.toLocaleUpperCase()}</p>
+          </div>
+        </Badge>
+      );
     case "closed":
-      return <Icons.closed className="w-4 h-4 mr-1 text-pink-400" />;
+      return (
+        <Badge className="bg-pink-300 hover:bg-pink-300">
+          <div className="text-zinc-950 flex items-center">
+            <Icons.closed className="w-3 h-3 mr-1" />
+            <p>{status.toLocaleUpperCase()}</p>
+          </div>
+        </Badge>
+      );
     default:
-      return <Icons.votingError className="w-4 h-4 mr-1 text-red-400" />;
+      return (
+        <Badge className="bg-red-300 hover:bg-red-300">
+          <div className="text-zinc-950 flex items-center">
+            <Icons.votingError className="w-3 h-3 mr-1" />
+            <p>{status.toLocaleUpperCase()}</p>
+          </div>
+        </Badge>
+      );
   }
 };
