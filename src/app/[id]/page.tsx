@@ -46,44 +46,6 @@ const GET_PROPOSALS = gql`
   }
 `;
 
-// const daos = [
-//   {
-//     id: "arbitrum-dao",
-//     name: "Arbitrum DAO",
-//     members: 10,
-//     image: "https://cdn.stamp.fyi/space/arbitrumfoundation.eth",
-//   },
-//   {
-//     id: "aave",
-//     name: "Aave",
-//     members: 10,
-//     image: "https://cdn.stamp.fyi/space/aave.eth",
-//   },
-//   {
-//     id: "pancakeswap",
-//     name: "Pancakeswap",
-//     members: 10,
-//     image: "https://cdn.stamp.fyi/space/cakevote.eth",
-//   },
-// ];
-
-// const proposals = [
-//   {
-//     id: 1,
-//     name: "Upgrade to v3",
-//     progress: 40,
-//   },
-//   // {
-//   //   id: 2,
-//   //   name: "Upgrade to v4",
-//   //   progress: 90,
-//   // },
-//   // {
-//   //   id: 3,
-//   //   name: "Upgrade to v5",
-//   //   progress: 60,
-//   // },
-// ];
 export default async function Home({ params }: { params: { id: string } }) {
   const id = params.id;
   // const dao = daos.find((dao) => dao.id === id);
@@ -127,7 +89,7 @@ export default async function Home({ params }: { params: { id: string } }) {
         <div className="flex flex-col md:flex-row gap-4 justify-between mt-4">
           <div className="flex gap-4 md:w-1/2 flex-col md:flex-row">
             <Input type="search" placeholder="Search proposal" />
-            <Link href={`/freeed.eth/create`} className="md:w-2/3 lg:w-1/3">
+            <Link href={`/${id}/create`} className="md:w-2/3 lg:w-1/3">
               <Button className="w-full">New Proposal</Button>
             </Link>
           </div>
@@ -165,7 +127,7 @@ export default async function Home({ params }: { params: { id: string } }) {
                 key={index}
               >
                 <CardHeader>
-                  <CardTitle className="justify-between flex">
+                  <CardTitle className="justify-between flex mb-4">
                     <Badge className="mr-2" variant="outline">
                       <StatusIcon status={proposal.state} />
                       {proposal.state}
@@ -190,7 +152,9 @@ export default async function Home({ params }: { params: { id: string } }) {
                 <CardFooter className="flex flex-col gap-1">
                   {/* <Progress className='mb-2' value={proposal.state} /> */}
                   <div className="flex gap-2 w-full">
-                    <Button variant="destructive">Cancel</Button>
+                    <Button variant="ghost" className="text-destructive">
+                      Cancel
+                    </Button>
                     <Button className="w-full">Execute</Button>
                   </div>
                   {/* <Button variant="destructive" className="w-full">
