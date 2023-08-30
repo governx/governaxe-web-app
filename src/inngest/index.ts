@@ -6,6 +6,20 @@ import { publicClient, walletClient } from "@/lib/web3Client";
 import * as InterchainProposalSender from "./abis/InterchainProposalSender.json";
 import { CHAINS, Environment, AxelarQueryAPI } from "@axelar-network/axelarjs-sdk";
 import { chains as testnetChains } from "./config/testnet.json";
+const GET_FOLLOWS = gql`
+  query getFollows($follower: String!) {
+    follows(first: 10, where: { follower: $follower }) {
+      follower
+      space {
+        id
+        name
+        avatar
+        followersCount
+      }
+      created
+    }
+  }
+`;
 
 import { env } from "@/env.mjs";
 
@@ -21,8 +35,8 @@ export const executeProposal = inngest.createFunction(
   async ({ event, step }) => {
     await step.sleepUntil(event.data.run_at);
     // await step.run("execute", async () => {
-    //   console.log(event.data);
-    //   console.log("Execute proposal");
+    //   console.log(JSON.stringify(event.data, null, 2));
+    //   console.log("POST Execute proposal");
     // });
 
     await step.run("execute", async () => {

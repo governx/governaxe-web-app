@@ -1,20 +1,5 @@
 import * as z from "zod";
-// "proposals": [
-//     {
-//       "calls": [
-//         {
-//           "args": [
-//             "Hello World"
-//           ],
-//           "func_selector": "function setState(string)",
-//           "target": "0x6Bcd366aFAB28C91357ae69CacB6CbBbCA46dF76",
-//           "value": 0
-//         }
-//       ],
-//       "dst_chain": "optimism",
-//       "dst_contract": "0xf9e2F5833F063b622e61ff3eb52b5E1D5ACdB432"
-//     }
-//   ],
+
 export const FormSchema = z.object({
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
@@ -40,7 +25,7 @@ export const FormSchema = z.object({
         value: z.coerce.number(),
       }),
       dst_chain: z.string(),
-      dst_contract: z.string(),
+      // dst_contract: z.string(),
     })
   ),
 
@@ -76,8 +61,8 @@ export type ProposalType =
   | "basic";
 
 export const chainList = [
-  { label: "Ethereum", value: "ETH" },
-  { label: "Optimism", value: "OP" },
-  { label: "Base", value: "BASE" },
-  { label: "Arbitrum", value: "ARB" },
+  { label: "Ethereum", value: "ethereum" },
+  { label: "Optimism", value: "optimism" },
+  { label: "Base", value: "base" },
+  { label: "Arbitrum", value: "arbitrum" },
 ] as const;

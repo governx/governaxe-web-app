@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { inngest } from "@/inngest"; // Import our client
+// import moment from "moment";
 import * as z from "zod";
 
 const bodySchema = z.object({
@@ -13,7 +14,6 @@ const bodySchema = z.object({
         value: z.coerce.number(),
       }),
       dst_chain: z.string(),
-      dst_contract: z.string(),
     })
   ),
   run_at: z.string(),
@@ -34,15 +34,17 @@ export async function POST(req: NextRequest) {
             {
               args: [proposal.calls.args],
               func_selector: proposal.calls.func_selector,
-              target: proposal.dst_contract,
+              target: proposal.calls.target,
               value: proposal.calls.value,
             },
           ],
           dst_chain: proposal.dst_chain,
-          dst_contract: proposal.dst_contract,
+          dst_contract: "0xf9e2F5833F063b622e61ff3eb52b5E1D5ACdB432",
         };
       }),
       src_chain: src_chain,
+      // add 5 minutes to the run_at time
+      // run_at: moment(run_at).add(5, "minutes").format("YYYY-MM-DDTHH:mm:ss.sssZ"),
       run_at,
     },
   });

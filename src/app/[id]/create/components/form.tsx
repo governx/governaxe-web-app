@@ -75,11 +75,11 @@ export function InputForm({ spaceId }: { spaceId: string }) {
     console.log("endTime", endTime);
 
     console.log("Date endTime", new Date(endTime * 1000));
-    const endTimeDate = moment(endTime).format("YYYY-MM-DDTHH:mm:ss.sssZ");
+    const endTimeDate = moment(endTime * 1000).format("YYYY-MM-DDTHH:mm:ss.sssZ");
 
     let proposalType = data.type as ProposalType;
     // console.log("startTime", startTimeDate);
-    console.log("endTimeDate", endTimeDate);
+    console.log("endTimeDate", moment(endTimeDate).format("YYYY-MM-DDTHH:mm:ss.sssZ"));
     try {
       const receipt = await snapshotClient.proposal(provider, address, {
         space: spaceId,
@@ -412,7 +412,7 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                     <FormField
                       control={form.control}
                       key={field.id}
-                      name={`proposals.${index}.dst_contract`}
+                      name={`proposals.${index}.calls.target`}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className={cn(index !== 0 && "sr-only")}>
@@ -499,7 +499,7 @@ export function InputForm({ spaceId }: { spaceId: string }) {
                     value: 0,
                   },
                   dst_chain: "",
-                  dst_contract: "",
+                  // dst_contract: "",
                 });
               }}
             >
