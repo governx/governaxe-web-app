@@ -151,12 +151,12 @@ export default async function Home({ params }: { params: { id: string } }) {
                 </CardHeader>
                 <CardFooter className="flex flex-col gap-1">
                   {/* <Progress className='mb-2' value={proposal.state} /> */}
-                  <div className="flex gap-2 w-full">
+                  {/* <div className="flex gap-2 w-full">
                     <Button variant="ghost" className="text-destructive">
                       Cancel
                     </Button>
                     <Button className="w-full">Execute</Button>
-                  </div>
+                  </div> */}
                   {/* <Button variant="destructive" className="w-full">
                     Cancel
                   </Button> */}
