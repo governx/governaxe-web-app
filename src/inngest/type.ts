@@ -13,6 +13,7 @@ type Proposal = {
 export type Events = {
   "proposal/execute": {
     data: {
+      proposal_id: string;
       proposals: Proposal[];
       src_chain: string;
       run_at: string;

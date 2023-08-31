@@ -4,6 +4,7 @@ import { inngest } from "@/inngest"; // Import our client
 import * as z from "zod";
 
 const bodySchema = z.object({
+  proposal_id: z.string(),
   src_chain: z.string(),
   proposals: z.array(
     z.object({
@@ -24,10 +25,11 @@ export async function POST(req: NextRequest) {
   console.log("POST /api/proposal");
   // Send your event payload to Inngest
   const body = await req.json();
-  const { src_chain, proposals, run_at } = bodySchema.parse(body);
+  const { proposal_id, src_chain, proposals, run_at } = bodySchema.parse(body);
   await inngest.send({
     name: "proposal/execute",
     data: {
+      proposal_id,
       proposals: proposals.map((proposal) => {
         return {
           calls: [

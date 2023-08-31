@@ -6,20 +6,6 @@ import { publicClient, walletClient } from "@/lib/web3Client";
 import * as InterchainProposalSender from "./abis/InterchainProposalSender.json";
 import { CHAINS, Environment, AxelarQueryAPI } from "@axelar-network/axelarjs-sdk";
 import { chains as testnetChains } from "./config/testnet.json";
-const GET_FOLLOWS = gql`
-  query getFollows($follower: String!) {
-    follows(first: 10, where: { follower: $follower }) {
-      follower
-      space {
-        id
-        name
-        avatar
-        followersCount
-      }
-      created
-    }
-  }
-`;
 
 import { env } from "@/env.mjs";
 
@@ -40,6 +26,51 @@ export const executeProposal = inngest.createFunction(
     // });
 
     await step.run("execute", async () => {
+      const GET_PROPOSAL = `
+        query getProposal($id: String!) {
+          proposal(id: $id) {
+            id
+            end
+            scores
+            choices
+          }
+        }
+      `;
+      const url = "https://testnet.snapshot.org/graphql";
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: GET_PROPOSAL,
+          variables: {
+            id: event.data.proposal_id,
+          },
+        }),
+      });
+
+      const json = await res.json();
+      console.log(json);
+      const { data } = json;
+      // find "For" choice
+      // cosnt forChoice =data.proposal.choices.find()
+      const forChoice = data.proposal.choices.findIndex((choice: string) => choice === "For");
+      // console.log("forChoice", forChoice);
+      // const forScore = data.proposal.scores[forChoice];
+      // check max score index
+      const maxScoreIndex = data.proposal.scores.reduce(
+        (iMax: number, x: number, i: number, arr: number[]) => (x > arr[iMax] ? i : iMax),
+        0
+      );
+
+      // if max score index is not for choice, return
+      if (maxScoreIndex !== forChoice) {
+        console.log("proposal not passed");
+        return;
+      }
+
       const executorAccount = privateKeyToAccount(`0x${env.EXECUTOR_PK}`);
       const abi = InterchainProposalSender.abi;
       const queryApi = new AxelarQueryAPI({ environment: Environment.TESTNET });
@@ -74,7 +105,7 @@ export const executeProposal = inngest.createFunction(
           // 0x68794b870000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b48656c6c6f20576f726c64000000000000000000000000000000000000000000
 
           //@ts-ignore
-          const callDataGasEstimate = await publicClient.estimateContractGas({
+          const callDataGasEstimate = await publicClient(proposal.dst_chain).estimateContractGas({
             address: `0x${call.target.slice(2)}`,
             abi: [funcSelctor],
             //@ts-ignore
@@ -113,7 +144,7 @@ export const executeProposal = inngest.createFunction(
       console.log("total ether gas fee", formatEther(totalGasFee));
       console.log("fmtProposals", fmtProposals[0].calls);
 
-      const { request } = await publicClient.simulateContract({
+      const { request } = await publicClient(event.data.src_chain).simulateContract({
         address: "0x6bd85C53D9AA00193e178589C0B10C9B8F0b1467",
         abi: abi,
         functionName: "sendProposals",
@@ -124,7 +155,7 @@ export const executeProposal = inngest.createFunction(
 
       // console.log("request", request.args);
 
-      await walletClient.writeContract(request);
+      await walletClient(event.data.src_chain).writeContract(request);
       console.log("Execute proposal");
     });
   }

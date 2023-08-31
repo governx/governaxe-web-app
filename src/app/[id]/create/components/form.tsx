@@ -93,10 +93,12 @@ export function InputForm({ spaceId }: { spaceId: string }) {
         plugins: JSON.stringify({}),
         discussion: "",
       });
-      console.log("receipt", receipt);
+      console.log("receipt", JSON.stringify(receipt));
       const res = await fetch("/api/proposal", {
         method: "POST",
         body: JSON.stringify({
+          // @ts-ignore
+          proposal_id: receipt.id,
           src_chain: data.src_chain,
           proposals: data.proposals,
           run_at: endTimeDate,
