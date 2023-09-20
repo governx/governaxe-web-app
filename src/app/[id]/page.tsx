@@ -16,47 +16,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getClient } from "@/lib/gqlClient";
-import { gql } from "@apollo/client";
+import { getProposals } from "@/lib/snapshot";
 
 //testnet snapshot
 const url = "https://demo.snapshot.org/#";
 
-const GET_PROPOSALS = gql`
-  query getProposals($space: String!) {
-    proposals(
-      first: 10
-      where: { space: $space }
-      orderBy: "created"
-      orderDirection: desc
-    ) {
-      id
-      title
-      state
-      start
-      end
-      snapshot
-      author
-    }
-  }
-`;
+export const revalidate = 20;
 
 export default async function Home({ params }: { params: { id: string } }) {
   const id = params.id;
-  const { data } = await getClient().query({
-    query: GET_PROPOSALS,
-    variables: {
-      space: id,
-    },
-    context: {
-      fetchOptions: {
-        next: { revalidate: 20 },
-      },
-    },
-  });
+  const response = await getProposals(id);
 
   return (
     <main
@@ -105,7 +77,7 @@ export default async function Home({ params }: { params: { id: string } }) {
         </div>
 
         <div className="gap-4 grid grid-cols-12 mt-4">
-          {data.proposals?.map(
+          {response.data.proposals?.map(
             (
               proposal: {
                 id: string;
@@ -145,18 +117,18 @@ export default async function Home({ params }: { params: { id: string } }) {
                   </CardTitle>
                   <CardDescription>{proposal.title}</CardDescription>
                 </CardHeader>
-                <CardFooter className="flex flex-col gap-1">
-                  {/* <Progress className='mb-2' value={proposal.state} /> */}
-                  {/* <div className="flex gap-2 w-full">
+                {/* <CardFooter className="flex flex-col gap-1"> */}
+                {/* <Progress className='mb-2' value={proposal.state} /> */}
+                {/* <div className="flex gap-2 w-full">
                     <Button variant="ghost" className="text-destructive">
                       Cancel
                     </Button>
                     <Button className="w-full">Execute</Button>
                   </div> */}
-                  {/* <Button variant="destructive" className="w-full">
+                {/* <Button variant="destructive" className="w-full">
                     Cancel
                   </Button> */}
-                </CardFooter>
+                {/* </CardFooter> */}
               </Card>
             ),
           )}

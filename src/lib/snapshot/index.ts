@@ -1,3 +1,4 @@
+import { Address } from "viem";
 import { env } from "../../env.mjs";
 import { isSnapshotError } from "../type-guards";
 import { getFollowsQuery } from "./queries/follows";
@@ -64,20 +65,20 @@ export async function snapshotFetch<T>({
   }
 }
 
-export async function getFollows(address: string): Promise<any | undefined> {
+export async function getFollows(address: Address): Promise<any | undefined> {
   const res = await snapshotFetch<any>({
     query: getFollowsQuery,
-    variables: { address },
+    variables: { follower: address },
     cache: "no-store",
   });
 
   return res.body;
 }
 
-export async function getProposals(address: string): Promise<any | undefined> {
+export async function getProposals(id: string): Promise<any | undefined> {
   const res = await snapshotFetch<any>({
     query: getProposalsQuery,
-    variables: { follower: address },
+    variables: { space: id },
     cache: "no-store",
   });
 
