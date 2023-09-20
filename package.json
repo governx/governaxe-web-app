@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "eslint --fix",
+    "*.{ts,tsx,css,md}": "prettier --write"
   },
   "dependencies": {
     "@apollo/client": "^3.8.0-rc.2",
@@ -58,5 +63,10 @@
     "viem": "^1.6.4",
     "wagmi": "^1.3.10",
     "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.3"
   }
 }
