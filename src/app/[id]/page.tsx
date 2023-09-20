@@ -14,8 +14,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -72,7 +70,6 @@ export default async function Home({ params }: { params: { id: string } }) {
         <div className="flex items-center justify-between flex-col md:flex-row">
           <div className="flex items-center gap-2">
             <Avatar className="mb-2">
-              {/* <AvatarImage src={dao?.image} alt={dao?.name} /> */}
               <AvatarFallback>{id?.slice(0, 2)}</AvatarFallback>
             </Avatar>
             <h1 className="text-2xl font-bold">{id}</h1>
@@ -120,7 +117,7 @@ export default async function Home({ params }: { params: { id: string } }) {
                 snapshot: string;
                 author: string;
               },
-              index: number
+              index: number,
             ) => (
               <Card
                 className="cursor-pointer col-span-12 md:col-span-6"
@@ -162,7 +159,7 @@ export default async function Home({ params }: { params: { id: string } }) {
                   </Button> */}
                 </CardFooter>
               </Card>
-            )
+            ),
           )}
         </div>
       </div>

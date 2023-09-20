@@ -1,4 +1,5 @@
 "use client";
+
 import "@rainbow-me/rainbowkit/styles.css";
 import { FC, PropsWithChildren } from "react";
 import {
@@ -6,7 +7,6 @@ import {
   getDefaultWallets,
   darkTheme,
 } from "@rainbow-me/rainbowkit";
-// import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { mainnet, goerli, baseGoerli, optimismGoerli } from "wagmi/chains";
@@ -31,21 +31,7 @@ const config = createConfig({
   publicClient,
 });
 
-// import { SessionProvider } from "next-auth/react";
-// // import { APP_NAME } from "@/lib/consts";
-// import { env } from "@/env.mjs";
-
-// const config = createConfig(
-//   getDefaultConfig({
-//     appName: APP_NAME,
-//     // infuraId: env.NEXT_PUBLIC_INFURA_ID,
-//     // alchemyId: env.NEXT_PUBLIC_ALCHEMY_ID,
-//     walletConnectProjectId: env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-//   })
-// );
-
 const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
-  //   <SessionProvider>
   <WagmiConfig config={config}>
     <RainbowKitProvider
       theme={darkTheme({
@@ -57,12 +43,9 @@ const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => (
       })}
       chains={chains}
     >
-      {/* <ConnectKitProvider theme='midnight'> */}
       {children}
-      {/* </ConnectKitProvider> */}
     </RainbowKitProvider>
   </WagmiConfig>
-  //   </SessionProvider>
 );
 
 export default Web3Provider;

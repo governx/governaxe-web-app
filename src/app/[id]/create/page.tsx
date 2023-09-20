@@ -1,38 +1,11 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Icons } from "@/components/icons";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 import { useRouter } from "next/navigation";
 import { InputForm } from "./components/form";
-
-const daos = [
-  {
-    id: "arbitrum-dao",
-    name: "Arbitrum DAO",
-    members: 10,
-    image: "https://cdn.stamp.fyi/space/arbitrumfoundation.eth",
-  },
-  {
-    id: "aave",
-    name: "Aave",
-    members: 10,
-    image: "https://cdn.stamp.fyi/space/aave.eth",
-  },
-  {
-    id: "pancakeswap",
-    name: "Pancakeswap",
-    members: 10,
-    image: "https://cdn.stamp.fyi/space/cakevote.eth",
-  },
-];
 
 const proposals = [
   {
@@ -58,54 +31,43 @@ const proposals = [
   },
 ];
 
-const info = [
-  {
-    title: "Start Date",
-    value: "Aug 10, 2023, 10:42 PM",
-  },
-  {
-    title: "End Date",
-    value: "Aug 13, 2023, 10:42 PM",
-  },
-  {
-    title: "Execution Block",
-    value: "17,885,442",
-  },
-];
-
-export default function Home({ params }: { params: { id: string; proposalid: string } }) {
+export default function Home({
+  params,
+}: {
+  params: { id: string; proposalid: string };
+}) {
   const id = params.id;
   const proposalid = params.proposalid;
   const proposal = proposals.find((proposal) => proposal.id === proposalid);
-  const dao = daos.find((dao) => dao.id === id);
+
   const router = useRouter();
   return (
     <main
-      className='flex flex-col items-center justify-between p-8'
+      className="flex flex-col items-center justify-between p-8"
       style={{
         minHeight: "calc(100vh - 5rem)",
       }}
     >
-      <div className='w-full max-w-6xl gap-4 grid grid-cols-12'>
-        <div className='col-span-12 md:col-spawn-8'>
-          <div className='flex items-center justify-between'>
-            <div className='gap-2'>
+      <div className="w-full max-w-6xl gap-4 grid grid-cols-12">
+        <div className="col-span-12 md:col-spawn-8">
+          <div className="flex items-center justify-between">
+            <div className="gap-2">
               <Button
-                variant='link'
-                className='px-0'
+                variant="link"
+                className="px-0"
                 onClick={() => {
                   router.back();
                 }}
               >
-                <Icons.back className='w-4 mr-1' />
+                <Icons.back className="w-4 mr-1" />
                 Back
               </Button>
-              <h1 className='text-2xl font-bold'>{proposal?.name}</h1>
+              <h1 className="text-2xl font-bold">{proposal?.name}</h1>
             </div>
           </div>
           <InputForm spaceId={id} />
         </div>
-        <div className='col-span-4 flex flex-col gap-4'></div>
+        <div className="col-span-4 flex flex-col gap-4"></div>
       </div>
     </main>
   );
