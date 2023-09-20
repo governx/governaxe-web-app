@@ -46,7 +46,6 @@ const GET_PROPOSALS = gql`
 
 export default async function Home({ params }: { params: { id: string } }) {
   const id = params.id;
-  // const dao = daos.find((dao) => dao.id === id);
   const { data } = await getClient().query({
     query: GET_PROPOSALS,
     variables: {

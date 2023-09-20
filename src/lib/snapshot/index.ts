@@ -1,6 +1,7 @@
 import { env } from "../../env.mjs";
 import { isSnapshotError } from "../type-guards";
 import { getFollowsQuery } from "./queries/follows";
+import { getProposalsQuery } from "./queries/proposals";
 
 const endpoint = env.NEXT_PUBLIC_SNAPSHOT_GRAPHQL_API_ENDPOINT;
 
@@ -67,6 +68,16 @@ export async function getFollows(address: string): Promise<any | undefined> {
   const res = await snapshotFetch<any>({
     query: getFollowsQuery,
     variables: { address },
+    cache: "no-store",
+  });
+
+  return res.body;
+}
+
+export async function getProposals(address: string): Promise<any | undefined> {
+  const res = await snapshotFetch<any>({
+    query: getProposalsQuery,
+    variables: { follower: address },
     cache: "no-store",
   });
 
