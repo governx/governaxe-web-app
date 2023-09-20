@@ -1,5 +1,6 @@
 import { NavBar } from "@/components/main-nav";
 import "../../styles/globals.css";
+
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { Inter } from "next/font/google";
@@ -23,7 +24,7 @@ export const metadata = {
     "Omnichain",
     "Interchain",
   ],
-  creator: "shadcn",
+  creator: "Governaxe",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
     { media: "(prefers-color-scheme: dark)", color: "black" },
@@ -41,7 +42,7 @@ export const metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [`${siteConfig.url}/og.png`],
-    creator: "@shadcn",
+    creator: "@Governaxe",
   },
   icons: {
     icon: "/favicon.ico",
