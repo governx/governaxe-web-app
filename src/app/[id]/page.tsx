@@ -1,14 +1,4 @@
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-import { Badge } from "@/components/ui/badge";
-
 import { Icons } from "@/components/icons";
 import {
   DropdownMenu,
@@ -18,11 +8,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { getProposals } from "@/lib/snapshot";
+import { ProposalCard } from "@/components/proposal-card";
 
-//testnet snapshot
-const url = "https://demo.snapshot.org/#";
+import Link from "next/link";
+
+import { getProposals } from "@/lib/snapshot";
 
 export const revalidate = 20;
 
@@ -77,76 +67,11 @@ export default async function Home({ params }: { params: { id: string } }) {
         </div>
 
         <div className="gap-4 grid grid-cols-12 mt-4">
-          {response.data.proposals?.map(
-            (
-              proposal: {
-                id: string;
-                title: string;
-                state: string;
-                start: number;
-                end: number;
-                snapshot: string;
-                author: string;
-              },
-              index: number,
-            ) => (
-              <Card
-                className="cursor-pointer col-span-12 md:col-span-6"
-                key={index}
-              >
-                <CardHeader>
-                  <CardTitle className="justify-between flex mb-4">
-                    <Badge className="mr-2" variant="outline">
-                      <StatusIcon status={proposal.state} />
-                      {proposal.state}
-                    </Badge>
-                    <Link
-                      href={`${url}/${id}/proposal/${proposal.id}`}
-                      target="_blank"
-                    >
-                      <Button
-                        size="sm"
-                        className="rounded-full gap-1 items-center"
-                        variant="secondary"
-                      >
-                        <Icons.snapshot className="w-4 h-4 text-yellow-500" />
-                        Snapshot
-                        <Icons.external className="w-3 h-3" />
-                      </Button>
-                    </Link>
-                  </CardTitle>
-                  <CardDescription>{proposal.title}</CardDescription>
-                </CardHeader>
-                {/* <CardFooter className="flex flex-col gap-1"> */}
-                {/* <Progress className='mb-2' value={proposal.state} /> */}
-                {/* <div className="flex gap-2 w-full">
-                    <Button variant="ghost" className="text-destructive">
-                      Cancel
-                    </Button>
-                    <Button className="w-full">Execute</Button>
-                  </div> */}
-                {/* <Button variant="destructive" className="w-full">
-                    Cancel
-                  </Button> */}
-                {/* </CardFooter> */}
-              </Card>
-            ),
-          )}
+          {response.data.proposals?.map((proposal: any, index: string) => (
+            <ProposalCard key={index} proposal={proposal} id={id} />
+          ))}
         </div>
       </div>
     </main>
   );
 }
-
-const StatusIcon = ({ status }: { status: string }) => {
-  switch (status) {
-    case "active":
-      return <Icons.active className="w-4 h-4 mr-1 text-green-400" />;
-    case "pending":
-      return <Icons.pending className="w-4 h-4 mr-1 text-blue-400" />;
-    case "closed":
-      return <Icons.closed className="w-4 h-4 mr-1 text-pink-400" />;
-    default:
-      return <Icons.votingError className="w-4 h-4 mr-1 text-red-400" />;
-  }
-};

@@ -9,6 +9,7 @@ export const env = createEnv({
     // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),
     NEXT_PUBLIC_WALLET_CONNECT_ID: z.string().min(1),
     NEXT_PUBLIC_SNAPSHOT_GRAPHQL_API_ENDPOINT: z.string().min(1),
+    NEXT_PUBLIC_SNAPSHOT_URL: z.string().min(1),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
 
@@ -17,5 +18,6 @@ export const env = createEnv({
     NEXT_PUBLIC_WALLET_CONNECT_ID: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID,
     NEXT_PUBLIC_SNAPSHOT_GRAPHQL_API_ENDPOINT:
       process.env.NEXT_PUBLIC_SNAPSHOT_GRAPHQL_API_ENDPOINT,
+    NEXT_PUBLIC_SNAPSHOT_URL: process.env.NEXT_PUBLIC_SNAPSHOT_URL,
   },
 });
